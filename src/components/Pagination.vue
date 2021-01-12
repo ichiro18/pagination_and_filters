@@ -30,6 +30,27 @@
         </a>
       </li>
 
+
+      <template v-if="pagination.currentPage > 3 && pagination.currentPage < pages[1][0]">
+        <li>
+          <a class="block bg-white rounded-full py-0 px-6 hover:bg-green-700 hover:text-white"
+             href="#"
+             @click.prevent="routeTo(pagination.currentPage)"
+          >
+            {{ pagination.currentPage }}
+          </a>
+        </li>
+
+        <li>
+          <a class="block bg-white rounded-full py-0 px-6 hover:bg-green-700 hover:text-white"
+             href="#"
+             @click.prevent="routeTo(pagination.currentPage + 3)"
+          >
+            ...
+          </a>
+        </li>
+      </template>
+
       <li v-for="page in pages[1]" :key="page" >
         <a class="block bg-white rounded-full h-6 w-6 flex items-center justify-center hover:bg-green-700 hover:text-white"
            :class="[ page === pagination.currentPage ? 'ring ring-green-700 ring-offset-4 ring-offset-green-100' : '']"
