@@ -24,7 +24,7 @@
       <li>
         <a class="block bg-white rounded-full py-0 px-6 hover:bg-green-700 hover:text-white"
            href="#"
-           @click.prevent="routeTo(pagination.currentPage - 3)"
+           @click.prevent="rewind"
         >
           ...
         </a>
@@ -33,7 +33,7 @@
 
       <template v-if="pagination.currentPage > 3 && pagination.currentPage < pages[1][0]">
         <li>
-          <a class="block bg-white rounded-full py-0 px-6 hover:bg-green-700 hover:text-white"
+          <a class="block bg-white rounded-full h-6 w-6 flex items-center justify-center hover:bg-green-700 hover:text-white ring ring-green-700 ring-offset-4 ring-offset-green-100"
              href="#"
              @click.prevent="routeTo(pagination.currentPage)"
           >
@@ -121,7 +121,6 @@ export default {
       this.pagination.pages = Math.max(Math.floor(this.total / this.perPage), 0);
       this.pagination.currentPage = +page || 1;
       if (this.pagination.currentPage === DEFAULT_PAGE && !!page) {
-        console.log('!!!');
         let query = Object.assign({}, this.$route.query);
         delete query.page;
         this.$router.replace({ query });
@@ -136,7 +135,6 @@ export default {
       let query = Object.assign({}, this.$route.query);
       query.page = targetPage;
       if (targetPage === DEFAULT_PAGE && !!page) {
-        console.log('!!!@');
         delete query.page;
       }
 
@@ -145,9 +143,12 @@ export default {
         const targetSearchParams = new URLSearchParams(query);
         targetUrl += `?${targetSearchParams}`
       }
-      console.log(targetUrl);
+      console.log('targetUrl', targetUrl);
 
       this.$router.push(targetUrl);
+    },
+    rewind() {
+        return this.pagination.currentPage <= 3 ? this.routeTo(this.pagination.currentPage + 3) : this.routeTo(this.pagination.currentPage - 3)
     },
     preparePaginationData() {
       return {
