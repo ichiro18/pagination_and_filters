@@ -1,6 +1,7 @@
 {
   "name": "pagination",
-  "version": "0.1.0",
+  "version": "0.0.1",
+  "title": "Listing Features",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -22,6 +23,7 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "html-webpack-template": "^6.2.0",
     "postcss": "7",
     "postcss-loader": "^4.1.0",
     "prettier": "^2.2.1",
