@@ -89,6 +89,11 @@
 <script>
 const DEFAULT_PAGE = 1;
 
+const PAGINATION_TYPES = {
+  query: 'query',
+  path: 'path',
+}
+
 export default {
   name: 'Pagination',
   props: {
@@ -100,6 +105,11 @@ export default {
       type: Number,
       default: 0,
     },
+    type: {
+      type: String,
+      default: 'query',
+      validator: (val) => Object.keys(PAGINATION_TYPES).includes(val)
+    }
   },
   data() {
     return {
@@ -128,13 +138,27 @@ export default {
   },
   methods: {
     parseUrl() {
-      const { page } = this.$route.query;
+      let page = 1;
+      switch (this.type) {
+        case PAGINATION_TYPES.path:
+          page =  this.$route.fullPath.replace(/(?<pageField>page)(?<pageNumber>\d+)/,(...match) => {
+            let groups = match.pop();
+            return groups.pageNumber;
+          }).replace('/', '');
+          break;
+        default:
+          page = this.$route.query.page;
+      }
       this.pagination.pages = Math.max(Math.floor(this.total / this.perPage), 0);
       this.pagination.currentPage = +page || 1;
       if (this.pagination.currentPage === DEFAULT_PAGE && !!page) {
-        let query = Object.assign({}, this.$route.query);
-        delete query.page;
-        this.$router.replace({ query });
+        switch (this.type) {
+          default:
+            // eslint-disable-next-line no-case-declarations
+            let query = Object.assign({}, this.$route.query);
+            delete query.page;
+            this.$router.replace({ query });
+        }
       }
 
       this.$emit('paginate', this.preparePaginationData());
@@ -142,17 +166,34 @@ export default {
     routeTo(page) {
       let targetPage = page;
       if (page <= 0) targetPage = 1;
+      let targetUrl = this.$route.fullPath;
 
-      let query = Object.assign({}, this.$route.query);
-      query.page = targetPage;
-      if (targetPage === DEFAULT_PAGE && !!page) {
-        delete query.page;
+      if (this.type === 'query') {
+        let query = Object.assign({}, this.$route.query);
+        query.page = targetPage;
+        if (targetPage === DEFAULT_PAGE && !!page) {
+          delete query.page;
+        }
+
+        if (Object.keys(query).length) {
+          const targetSearchParams = new URLSearchParams(query);
+          targetUrl += `?${targetSearchParams}`;
+        }
       }
-
-      let targetUrl = this.$route.path;
-      if (Object.keys(query).length) {
-        const targetSearchParams = new URLSearchParams(query);
-        targetUrl += `?${targetSearchParams}`;
+      if (this.type === 'path') {
+        if (targetUrl.indexOf('page') >= 0) {
+          targetUrl = this.$route.fullPath.replace(/(?<pageField>page)(?<pageNumber>\d+)/, (...match) => {
+            let groups = match.pop();
+            return `${groups.pageField}${targetPage}`;
+          });
+        } else {
+          targetUrl += `page${targetPage}`
+        }
+        if (targetPage === DEFAULT_PAGE && !!page) {
+          targetUrl = this.$route.fullPath.replace(/(?<pageField>page)(?<pageNumber>\d+)/, () => {
+            return ''
+          });
+        }
       }
       console.log('targetUrl', targetUrl);
 

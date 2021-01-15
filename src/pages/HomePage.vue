@@ -11,7 +11,7 @@
           <p class="text-gray-700">{{ item.body }}</p>
         </div>
       </div>
-      <pagination :per-page="9" @paginate="onPaginate" :total="totalPages" />
+      <pagination :per-page="9" @paginate="onPaginate" :total="totalPages" type="path"/>
     </div>
   </div>
 </template>
