@@ -153,8 +153,13 @@ export default {
       this.pagination.currentPage = +page || 1;
       if (this.pagination.currentPage === DEFAULT_PAGE && !!page) {
         switch (this.type) {
+          case PAGINATION_TYPES.path:
+            const targetUrl = this.$route.fullPath.replace(/(?<pageField>page)(?<pageNumber>\d+)/, () => {
+              return ''
+            });
+            this.$router.replace(targetUrl);
+            break;
           default:
-            // eslint-disable-next-line no-case-declarations
             let query = Object.assign({}, this.$route.query);
             delete query.page;
             this.$router.replace({ query });
